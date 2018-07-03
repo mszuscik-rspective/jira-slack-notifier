@@ -11,7 +11,7 @@ app.get('/test', (req, res) => {
 app.post('/test', (req, res) => {
   res.send({
     response_type: 'in_channel',
-    text: JSON.stringify(req)
+    text: JSON.stringify(req.body)
   });
 });
 
