@@ -1,16 +1,16 @@
+const DevList = require('./DevList');
 
+const devList = new DevList();
 
 const commands = {
   help: () => 'test, list, add, remove, review',
-  test: () => 'I\'m fine',
-  list: () => {
-    return 'list called';
+  test: () => 'What\'s up?',
+  list: () => devList.getAll(),
+  add: dev => {
+    devList.add(dev);
   },
-  add: () => {
-    return 'add called';
-  },
-  remove: () => {
-    return 'remove called';
+  remove: dev => {
+    devList.remove(dev);
   },
   review: () => {
     return 'review called';
