@@ -5,7 +5,7 @@ const devList = new DevList();
 const commands = {
   help: () => 'test, list, add, remove, review',
   test: () => 'What\'s up?',
-  list: () => devList.getAll(),
+  list: () => devList.getAll().join(', '),
   add: dev => {
     devList.add(dev);
   },
