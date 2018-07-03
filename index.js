@@ -2,7 +2,9 @@ const express = require('express');
 
 const app = express();
 
-app.use(express.json());
+app.use(express.json({
+  type: 'application/x-www-form-urlencoded'
+}));
 
 app.get('/test', (req, res) => {
   res.send('Notifier is working');
