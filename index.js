@@ -9,7 +9,10 @@ app.get('/test', (req, res) => {
 });
 
 app.post('/test', (req, res) => {
-  res.send('Notifier is working');
+  res.send({
+    response_type: 'in_channel',
+    text: JSON.stringify(req)
+  });
 });
 
 const PORT = process.env.PORT || 5000;
