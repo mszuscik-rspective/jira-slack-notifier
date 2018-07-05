@@ -18,6 +18,7 @@ module.exports = app => {
     try {
       response = await slackHandler.handleCommand(text);
     } catch (error) {
+      console.log('error:', error);
       response = 'I don\'t understand the command';
     }
 

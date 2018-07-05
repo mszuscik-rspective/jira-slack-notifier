@@ -20,12 +20,15 @@
   "homepage": "https://github.com/mszuscik-rspective/jira-slack-notifier#readme",
   "dependencies": {
     "express": "^4.16.3",
+    "lodash": "^4.17.10",
     "lowdb": "^1.0.0"
   },
   "devDependencies": {
     "nodemon": "^1.17.5"
   },
   "nodemonConfig": {
-    "ignore": ["db.json"]
+    "ignore": [
+      "db.json"
+    ]
   }
 }

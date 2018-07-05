@@ -1,19 +1,24 @@
-const DevList = require('./DevList');
+const DbService = require('./DbService');
+const AssignManager = require('./AssignManager');
 
-const devList = new DevList();
+const db = new DbService();
+const assignManager = new AssignManager();
 
 const commands = {
   help: () => 'test, list, add, remove, review',
   test: () => 'What\'s up?',
-  list: () => devList.getAll().join(', '),
+  list: () => db
+    .getAllDevs()
+    .map(dev => dev.name)
+    .join(', '),
   add: dev => {
-    devList.add(dev);
+    db.addDev(dev);
   },
   remove: dev => {
-    devList.remove(dev);
+    db.removeDev(dev);
   },
-  review: () => {
-    return 'review called';
+  review: async () => {
+    return await assignManager.assignDevs();
   }
 };
 
@@ -29,7 +34,7 @@ const handleCommand = async (data) => {
     .replace(commandName, '')
     .trim();
 
-  return command(params);
+  return await command(params);
 };
 
 module.exports = {
