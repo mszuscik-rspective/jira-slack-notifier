@@ -1,5 +1,4 @@
-const low = require('lowdb');
-const FileSync = require('lowdb/adapters/FileSync');
+const _ = require('lodash');
 const Developer = require('../models/Developer');
 
 const KEYS = {
@@ -9,61 +8,47 @@ const KEYS = {
 
 class DbService {
   constructor() {
-    const adapter = new FileSync('db.json');
-    this.db = low(adapter);
-
-    this.db.defaults({ developers: [], assignments: [] }).write();
+    this.db = {
+      [KEYS.developers]: [],
+      [KEYS.assignments]: []
+    };
   }
 
   resetAll() {
-    for (let key in KEYS) {
-      this.db
-        .get(KEYS[key])
-        .remove()
-        .write();
-    }
+    this.db = {
+      [KEYS.developers]: [],
+      [KEYS.assignments]: []
+    };
   }
 
   // ===== developers ====================================
   getAllDevs() {
-    return this.db
-      .get(KEYS.developers)
-      .value();
+    return this.db[KEYS.developers];
   }
 
   getDevByName(name) {
-    return this.db
-      .get(KEYS.developers)
-      .find({ name })
-      .value();
+    return this.db[KEYS.developers]
+      .find(dev => dev.name === name);
   }
 
   addDev(devName, slackId) {
-    this.db
-      .get(KEYS.developers)
-      .push(new Developer(devName, slackId))
-      .write();
+    this.db[KEYS.developers]
+      .push(new Developer(devName, slackId));
   }
 
   removeDev(devName) {
-    this.db
-      .get(KEYS.developers)
-      .remove({ name: devName })
-      .write();
+    this.db[KEYS.developers] = 
+      _.remove(this.db[KEYS.developers], dev => dev.name === devName);
   }
 
   // ===== assignments ===================================
   getAllAssignments() {
-    return this.db
-      .get(KEYS.assignments)
-      .value();
+    return this.db[KEYS.assignments];
   }
 
   addAssignments(assignments) {
-    this.db
-      .get(KEYS.assignments)
-      .push(...assignments)
-      .write();
+    this.db[KEYS.assignments]
+      .push(...assignments);
   }
 }
 
