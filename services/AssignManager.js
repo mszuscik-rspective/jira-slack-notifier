@@ -21,6 +21,10 @@ class AssignManager {
   async assignDevs() {
     const assigneeQueue = new RepeatQueue(db.getAllDevs().map(dev => dev.name), _getLastSelectedDeveloper());
 
+    if (!assigneeQueue.queue.length) {
+      return 'No devs specified.';
+    }
+
     const waitingTasks = await jiraService.getWaitingTasks();
     const existingAssignments = db.getAllAssignments();
 
