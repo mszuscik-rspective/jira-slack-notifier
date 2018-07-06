@@ -12,34 +12,29 @@ const links = {
  * returns { key: String, assignee: String}
  */
 const getWaitingTasks = async () => {
-  try {
-    const jiraConfig = { headers: { Authorization: config.authorization } };
+  const jiraConfig = { headers: { Authorization: config.authorization } };
 
-    const sprintResult = await axios.get(
-      config.jiraUrl + links.currentSprint(config.board),
-      jiraConfig
-    );
-    const activeSprintId = sprintResult.data.values[0].id;
+  const sprintResult = await axios.get(
+    config.jiraUrl + links.currentSprint(config.board),
+    jiraConfig
+  );
+  const activeSprintId = sprintResult.data.values[0].id;
 
-    const issuesResult = await axios.get(
-      config.jiraUrl + links.sprintIssues(config.board, activeSprintId),
-      jiraConfig
-    );
+  const issuesResult = await axios.get(
+    config.jiraUrl + links.sprintIssues(config.board, activeSprintId),
+    jiraConfig
+  );
 
-    const waitingStatusIds = config.waitingStatusIds.split(',');
-    const waitingIssues = issuesResult.data
-      .issues
-      .filter(issue => waitingStatusIds.includes(issue.fields.status.id));
+  const waitingStatusIds = config.waitingStatusIds.split(',');
+  const waitingIssues = issuesResult.data
+    .issues
+    .filter(issue => waitingStatusIds.includes(issue.fields.status.id));
 
-    return waitingIssues
-      .map(issue => ({
-        key: issue.key,
-        assignee: issue.fields.assignee.name
-      }));
-  } catch (error) {
-    console.error(error);
-    return null;
-  }
+  return waitingIssues
+    .map(issue => ({
+      key: issue.key,
+      assignee: issue.fields.assignee.name
+    }));
 };
 
 module.exports = {
