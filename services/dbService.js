@@ -23,10 +23,17 @@ class DbService {
       .value();
   }
 
-  addDev(devName) {
+  getDevByName(name) {
+    return this.db
+      .get(KEYS.developers)
+      .find({ name })
+      .value();
+  }
+
+  addDev(devName, slackId) {
     this.db
       .get(KEYS.developers)
-      .push(new Developer(devName))
+      .push(new Developer(devName, slackId))
       .write();
   }
 
@@ -52,4 +59,6 @@ class DbService {
   }
 }
 
-module.exports = DbService;
+const instance = new DbService();
+
+module.exports = instance;

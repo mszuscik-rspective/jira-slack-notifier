@@ -1,11 +1,44 @@
+const axios = require('axios');
+const config = require('../config/config');
 
-// TODO: should return waiting tasks with user that is assigned for that
-// NOTE: how could developers be compared?
+const links = {
+  currentSprint: board =>
+    `/rest/agile/1.0/board/${board}/sprint?state=active`,
+  sprintIssues: (board, sprintId) =>
+    `/rest/agile/1.0/board/${board}/sprint/${sprintId}/issue?maxResults=100&fields=assignee,status`
+};
+
+/**
+ * returns { key: String, assignee: String}
+ */
 const getWaitingTasks = async () => {
-  return [
-    'Task004',
-    'Task002'
-  ];
+  try {
+    const jiraConfig = { headers: { Authorization: config.authorization } };
+
+    const sprintResult = await axios.get(
+      config.jiraUrl + links.currentSprint(config.board),
+      jiraConfig
+    );
+    const activeSprintId = sprintResult.data.values[0].id;
+
+    const issuesResult = await axios.get(
+      config.jiraUrl + links.sprintIssues(config.board, activeSprintId),
+      jiraConfig
+    );
+
+    const waitingIssues = issuesResult.data
+      .issues
+      .filter(issue => config.waitingStatusIds.includes(issue.fields.status.id));
+
+    return waitingIssues
+      .map(issue => ({
+        key: issue.key,
+        assignee: issue.fields.assignee.name
+      }));
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
 };
 
 module.exports = {

@@ -1,6 +1,7 @@
 class Developer {
-  constructor(name) {
+  constructor(name, slackId) {
     this.name = name;
+    this.slackId = slackId;
   }
 }
 

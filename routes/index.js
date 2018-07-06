@@ -18,13 +18,17 @@ module.exports = app => {
     try {
       response = await slackHandler.handleCommand(text);
     } catch (error) {
-      console.log('error:', error);
-      response = 'I don\'t understand the command';
+      console.error(error);
+      response = 'Something went wrong. Please check the service.';
     }
 
-    res.send({
-      response_type: 'in_channel',
-      text: response
-    });
+    if (response) {
+      res.send({
+        response_type: 'in_channel',
+        text: response
+      });
+    } else {
+      res.sendStatus(200);
+    }
   });
 };

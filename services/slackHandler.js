@@ -1,7 +1,6 @@
-const DbService = require('./DbService');
+const db = require('./dbService');
 const AssignManager = require('./AssignManager');
 
-const db = new DbService();
 const assignManager = new AssignManager();
 
 const commands = {
@@ -11,10 +10,11 @@ const commands = {
     .getAllDevs()
     .map(dev => dev.name)
     .join(', '),
-  add: dev => {
-    db.addDev(dev);
+  add: data => { // data: name slackId
+    const params = data.split(' ');
+    db.addDev(params[0], params[1]);
   },
-  remove: dev => {
+  remove: dev => { // dev: name
     db.removeDev(dev);
   },
   review: async () => {
@@ -27,7 +27,7 @@ const handleCommand = async (data) => {
   const command = commands[commandName];
 
   if (!command) {
-    throw TypeError('Command doesn\'t exist');
+    return 'I don\'t understand the command';
   }
 
   const params = data

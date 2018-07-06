@@ -1,10 +1,9 @@
 const _ = require('lodash');
-const DbService = require('./DbService');
+const db = require('./dbService');
 const RepeatQueue = require('./RepeatQueue');
 const jiraService = require('./jiraService');
 const Assignment = require('../models/Assignment');
-
-const db = new DbService();
+const config = require('../config/config');
 
 const _getLastSelectedDeveloper = () => {
   const lastAssignment = _.last(db.getAllAssignments());
@@ -13,16 +12,15 @@ const _getLastSelectedDeveloper = () => {
     : null;
 };
 
+const _getDev = devName => {
+  const dev = db.getDevByName(devName);
+  return dev.slackId ? `<@${dev.slackId}>` : dev.name;
+};
+
 class AssignManager {
-  constructor() {
-    const devNames = db
-      .getAllDevs()
-      .map(dev => dev.name);
-
-    this.assigneeQueue = new RepeatQueue(devNames, _getLastSelectedDeveloper());
-  }
-
   async assignDevs() {
+    const assigneeQueue = new RepeatQueue(db.getAllDevs().map(dev => dev.name), _getLastSelectedDeveloper());
+
     const waitingTasks = await jiraService.getWaitingTasks();
     const existingAssignments = db.getAllAssignments();
 
@@ -30,16 +28,17 @@ class AssignManager {
       .map(assignment => assignment.task);
 
     const unassignedTasks = waitingTasks
+      .map(task => task.key)
       .filter(task => !assignedTasks.includes(task));
 
     const newAssignments = unassignedTasks
       .map(task => {
-        const users = [
-          this.assigneeQueue.shift(),
-          this.assigneeQueue.shift()
+        const devs = [
+          assigneeQueue.shift(),
+          assigneeQueue.shift()
         ];
 
-        return new Assignment(task, users);
+        return new Assignment(task, devs);
       });
 
     db.addAssignments(newAssignments);
@@ -47,8 +46,11 @@ class AssignManager {
     const allAssignments = existingAssignments.concat(newAssignments);
 
     return waitingTasks
-      .map(task => allAssignments.find(assignment => assignment.task === task))
-      .map(assignment => `${assignment.task}: ${assignment.devs[0]}, ${assignment.devs[1]}`)
+      .map(task => allAssignments.find(assignment => assignment.task === task.key))
+      .map(assignment => {
+        const link = `<${config.jiraUrl}/browse/${assignment.task}|${assignment.task}>`;
+        return `${link}: ${_getDev(assignment.devs[0])}, ${_getDev(assignment.devs[1])}`;
+      })
       .join('\n');
   }
 }
