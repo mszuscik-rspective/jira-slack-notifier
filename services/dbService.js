@@ -11,9 +11,17 @@ class DbService {
   constructor() {
     const adapter = new FileSync('db.json');
     this.db = low(adapter);
- 
-    this.db.defaults({ developers: [], assignments: [] })
-      .write();
+
+    this.db.defaults({ developers: [], assignments: [] }).write();
+  }
+
+  resetAll() {
+    for (let key in KEYS) {
+      this.db
+        .get(KEYS[key])
+        .remove()
+        .write();
+    }
   }
 
   // ===== developers ====================================

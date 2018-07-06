@@ -26,9 +26,10 @@ const getWaitingTasks = async () => {
       jiraConfig
     );
 
+    const waitingStatusIds = config.waitingStatusIds.split(',');
     const waitingIssues = issuesResult.data
       .issues
-      .filter(issue => config.waitingStatusIds.includes(issue.fields.status.id));
+      .filter(issue => waitingStatusIds.includes(issue.fields.status.id));
 
     return waitingIssues
       .map(issue => ({
