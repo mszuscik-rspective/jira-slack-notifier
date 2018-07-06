@@ -32,17 +32,16 @@ class AssignManager {
       .map(assignment => assignment.task);
 
     const unassignedTasks = waitingTasks
-      .map(task => task.key)
-      .filter(task => !assignedTasks.includes(task));
+      .filter(task => !assignedTasks.includes(task.key));
 
     const newAssignments = unassignedTasks
       .map(task => {
         const devs = [
-          assigneeQueue.shift(),
-          assigneeQueue.shift()
+          assigneeQueue.shift(task.assignee),
+          assigneeQueue.shift(task.assignee)
         ];
 
-        return new Assignment(task, devs);
+        return new Assignment(task.key, devs);
       });
 
     db.addAssignments(newAssignments);
